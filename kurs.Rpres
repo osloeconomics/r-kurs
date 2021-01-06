@@ -6,29 +6,39 @@ autosize: true
 font-family: "TW Cen MT"
 
 Hvorfor R?
-========================================================
+================================================================================
 left: 40 %
-I Oslo Economics har vi tre hovedanliggende når det gjelder kvantitative data: 
-- **Databehandling**
-- **Analyse**
-- **Visualisering** av data og analyseresultater
+Tre sentrale arbeidsoppgaver i Oslo Economics: 
+- Databehandling
+- Analyse
+- Visualisering
 
-For de to første punktene er det særlig viktig med dokumenterbarhet og etterprøvbarhet.
-***
-Velg Python eller R for allsidighet, dokumenterbarhet og etterprøvbarhet.
+For de to første punktene er det særlig viktig med dokumenterbarhet og etterprøvbarhet. 
 
-Velg Excel for modellering eller kjappe analyser.
+Det er her R-script (og do-filer og python-script) kommer inn.
 
-| Verktøy | Databehandling | Analyse        | Diagrammer    | Kart      |
+Også for visualisering (f.eks. diagrammer eller kart) kan det være nyttig å ha et script.
+
+
+Hvorfor R?
+================================================================================
+
+|  | Databehandling | Analyse        | Diagrammer    | Kart      |
 |---------|----------------|----------------|---------------|-----------|
 | Excel   | omg just don't | omg just don't | Ja            | Begrenset |
 | Stata   | Ja             | Ja             | Ja            | Begrenset |
 | Python  | Ja             | Ja             | Ja            | Ja        |
 | R       | Ja             | Ja             | Ja            | Ja        |
-| QGIS^*    | Begrenset      | Nei            | Nei           | Ja        |  
+| QGIS    | Begrenset      | Nei            | Nei           | Ja        |
+
+Velg **R** eller Python for allsidighet, dokumenterbarhet og etterprøvbarhet. Velg **R** eller Stata dersom du først og fremst skal kjøre regresjoner. 
+
+Velg Excel for å lage diagrammer, og dersom du trenger kjappe og enkle analyser. Velg QGIS for å lage pene kart, men vær oppmerksom på at det kan være tidkrevende dersom du trenger å gjøre det på nytt (f.eks. på andre data).
+
+**R kan gjøre stort sett alt som Excel, Stata, Python og QGIS kan.**
 
 Hva vil du lære på dette kurset?
-========================================================
+================================================================================
 
 - **R basics**: Kodeprinsipper og vanligste funksjoner
 - **Arbeidsflyt**: Veien fra rådata til analyseresultater
@@ -38,41 +48,10 @@ Hva vil du lære på dette kurset?
 - Scriptet nedlasting av data vha. API
 - Lage kart og diagrammer
 
-Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet
-
-Pakker
-========================================================
-De viktigste funksjonene er integrert i R, men en del funksjoner krever at du installerer og laster inn *pakker* ved hjelp av `library`-funksjonen.
-
-```{r, eval = FALSE}
-install.packages("dplyr") # Merk: anførselstegn
-library(dplyr) # Merk: ikke anførselstegn
-filter(mtcars, cyl >= 8) # Kun biler med svær motor
-```
-
-Det er også mulig å benytte spesifikke funksjoner uten å laste inn pakken først:
-
-```{r, eval = FALSE}
-dplyr::filter(mtcars, cyl >= 8)
-```
-
-Tidyverse
-========================================================
-Vi brukte `filter`-funksjonen fra `dplyr`-pakken til å lage et utvalg fra datasettet.
-Vi kunne også brukt innebygget R-funksjonalitet, men `dplyr`-syntaksen er mer intuitiv:
-
-```{r, eval = FALSE}
-mtcars[mtcars$cyl >= 8, ]
-# sammenlignet med
-filter(mtcars, cyl >= 8)
-```
-
-`dplyr`-syntaksen er bygget rundt **verb**, og beskriver nærmest med ord hva som skjer med dataene: "filtrer data til biler med flere enn åtte sylindre".
-
-`dplyr` er en del av `tidyverse`, en samling med pakker som er skapt for databehandling, og deler samme grammatikk, datastruktur og underliggende filosofi. Vi kommer stort sett til å forbli innenfor `tidyverse` i dette kurset. 
+Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet.
 
 Objekter
-=========================================================
+================================================================================
 
 R er et *objektorientert* språk. Et objekt kan være tall, tekststreng, datasett, vektor, etc.:
 
@@ -91,4 +70,38 @@ Dobbelt likhetstegn brukes for å sammenligne noe (som i Stata)
 ```{r, eval = TRUE}
 n1 == as.integer(n2) 
 ```
+
+Pakker
+================================================================================
+
+![some caption](test.png)
+
+De viktigste funksjonene er integrert i R, men en del funksjoner krever at du installerer og laster inn *pakker* ved hjelp av `library`-funksjonen.
+
+```{r, eval = FALSE}
+install.packages("dplyr") # Merk: anførselstegn
+library(dplyr) # Merk: ikke anførselstegn
+filter(mtcars, cyl >= 8) # Kun biler med svær motor
+```
+
+Det er også mulig å benytte spesifikke funksjoner uten å laste inn pakken først:
+
+```{r, eval = FALSE}
+dplyr::filter(mtcars, cyl >= 8)
+```
+
+Tidyverse
+================================================================================
+Vi kan også bruke innebygget R-funksjonalitet for å filtrere data:
+
+```{r, eval = TRUE}
+a <- mtcars[mtcars$cyl >= 8, ] 
+b <- dplyr::filter(mtcars, cyl >= 8)
+identical(a, b) # Sjekk om vi får samme resultat
+```
+
+`dplyr`-syntaksen er bygget rundt **verb**, og beskriver nærmest med ord hva som skjer med dataene (på ængelsk da): "apply a filter to `mtcars` that keeps cars with `>=` 8 cylinders".
+
+`dplyr` er en del av `tidyverse`, en samling med pakker som er skapt for databehandling, og deler samme grammatikk, datastruktur og underliggende filosofi. Vi kommer stort sett til å forbli innenfor `tidyverse` i dette kurset. 
+
 
