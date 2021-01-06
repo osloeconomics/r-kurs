@@ -1,7 +1,7 @@
 R: Databehandling, analyse og visualisering
 ========================================================
 author: Eivind Moe Hammersmark
-date: 05 januar, 2021
+date: 06 januar, 2021
 autosize: true
 font-family: "TW Cen MT"
 
@@ -50,21 +50,23 @@ Hva vil du lære på dette kurset?
 
 Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet.
 
-Objekter
+Objekter og operatorer
 ================================================================================
 
-R er et *objektorientert* språk. Et objekt kan være tall, tekststreng, datasett, vektor, etc.:
+R er et *objektorientert* språk. De vanligste objekttypene er vector, matrix, data.frame og list. Vi lager objekter ved hjelp av en "venstre-pil".
 
 
 ```r
-n1 <- 420 # "numeric"-objekt
+n1 <- 420
 ```
 
+Objekter forblir lagret i minnet fram til R avsluttes, eller til man fjerner objektet manuelt ved hjelp av `rm()`. En av fordelene med R (sammnelignet med Stata) er at det er mulig å ha mange datasett i minnet samtidig.
+ 
 `=` brukes inni funksjoner, ikke til å lage objekter:
 
 
 ```r
-n2 <- paste("4", "2", "0", sep = "") # "character"
+n2 <- paste("4", "2", "0", sep = "") # "limer" sammen 4, 2 og 0
 ```
 
 Dobbelt likhetstegn brukes for å sammenligne noe (som i Stata)
@@ -78,10 +80,120 @@ n1 == as.integer(n2)
 [1] TRUE
 ```
 
+Ellers fungerer de vanlige matematiske operatorene som forventet
+
+```r
+(200 + 15 - 5) * 2
+```
+
+```
+[1] 420
+```
+
+Objekttyper
+================================================================================
+Vi har altså `vector`, `matrix`, `data.frame` og `list`. `matrix` består av én eller flere `vector`. 
+
+
+```r
+v1 <- c(1, 2, 3) # c()-funksjonen lager vektorer
+v2 <- c(4, 5, 6)
+matrix(c(v1, v2), nrow = 3, ncol = 2)
+```
+
+```
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+[3,]    3    6
+```
+
+`data.frame` er en slags `matrix` med kolonnenavn (men er egentlig basert på `list`)
+
+
+```r
+class(mtcars)
+```
+
+```
+[1] "data.frame"
+```
+
+```r
+typeof(mtcars) # typeof gir den underliggende datastrukturen
+```
+
+```
+[1] "list"
+```
+
+Hente ut elementer fra objekter
+================================================================================
+Det finnes hovedsakelig to funksjoner for å hente ut elementer av objekter, `$` og `[]`. Førstnevnte fungerer bare på `data.frame` og `named list`. Syntaksen er `mtcars$kolonnenavn` og `mtcars[, kolonne]`. I sistnevnte kan også rader spesifiseres.
+
+
+```r
+# Alle rader, kolonnen "cyl"
+mtcars$cyl 
+mtcars[, "cyl"] # merk anførselstegn her
+# Rad 1 til 3, kolonne "cyl"
+mtcars$cyl[1:3]
+mtcars[1:3, "cyl"]
+mtcars[1:3, 2] # Kan også bruke kolonnens plassing ("cyl" er kolonne nr. 2)
+```
+
+Klamme-syntaksen kan også brukes til å lage "delmengder" av objektene:
+
+
+```r
+mtcars[mtcars$cyl > 4, ] # henter ut alle rader hvor "cyl" er større enn 4
+mtcars[mtcars$cyl > 4, "cyl"] # henter ut alle verdier av "cyl" som er større enn 4
+```
+
+"list"-objekter
+================================================================================
+Et `list`-objekt er en liste med objekter, for eksempel en liste med `data.frame`. `list`-objekter er hierarkiske og kan ha mange nivåer.
+
+
+```r
+l1 <- list(3, 4) # `list` med ett nivå
+l2 <- list(list(3, 4), list(5, 6)) # `list` med to nivåer
+```
+
+Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan `$` benyttes. Hvis ikke, brukes doble klammer, `[[]]`:
+
+
+```r
+testlist <- list("element1" = 3, "element2" = 4) # navngitt liste 
+testlist[[1]]
+```
+
+```
+[1] 3
+```
+
+```r
+testlist$element1
+```
+
+```
+[1] 3
+```
+Lister er nyttige dersom du trenger å utføre samme operasjon på flere objekter. For eksempel samme regresjon på flere datasett:
+
+
+```r
+mtlist <- list(mtcars, mtcars[mtcars$cyl > 4, ])
+lapply(mtlist, function(x) {
+    reg <- lm(mpg ~ cyl + hp + wt, data = x)
+    summary(reg)
+  })
+```
+
 Pakker
 ================================================================================
 
-![some caption](test.png)
+![Pakker](stickers.png)
 
 De viktigste funksjonene er integrert i R, men en del funksjoner krever at du installerer og laster inn *pakker* ved hjelp av `library`-funksjonen.
 
@@ -118,4 +230,13 @@ identical(a, b) # Sjekk om vi får samme resultat
 
 `dplyr` er en del av `tidyverse`, en samling med pakker som er skapt for databehandling, og deler samme grammatikk, datastruktur og underliggende filosofi. Vi kommer stort sett til å forbli innenfor `tidyverse` i dette kurset. 
 
+Vanligste funksjoner
+================================================================================
+La oss ta et steg tilbake og se på de mest brukte og nyttigste funksjonene i R. Mye av koden vi skriver vil dreie seg om databehandling.
+Andre oppgaver, som f.eks. regresjoner krever mindre kode, og er relativt enkelt å utføre. Nedenfor ser vi på de vanligste og mest generelle innebygde funksjonene
 
+
+```r
+summary(mtcars) # Oppsummering av data (ekvivalent med -summarize- i Stata)
+table(mtcars$cyl) # Tabulering av data (ekv. med -tabulate- i Stata)
+```
