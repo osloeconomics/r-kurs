@@ -50,7 +50,7 @@ Hva vil du lære på dette kurset?
 
 Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet.
 
-Objekter og operatorer
+Objekter
 ================================================================================
 
 R er et *objektorientert* språk. De vanligste objekttypene er vector, matrix, data.frame og list. Vi lager objekter ved hjelp av en "venstre-pil".
@@ -61,7 +61,9 @@ n1 <- 420
 ```
 
 Objekter forblir lagret i minnet fram til R avsluttes, eller til man fjerner objektet manuelt ved hjelp av `rm()`. En av fordelene med R (sammnelignet med Stata) er at det er mulig å ha mange datasett i minnet samtidig.
- 
+
+Operatorer
+================================================================================
 `=` brukes inni funksjoner, ikke til å lage objekter:
 
 
@@ -96,16 +98,14 @@ Vi har altså `vector`, `matrix`, `data.frame` og `list`. `matrix` består av é
 
 
 ```r
-v1 <- c(1, 2, 3) # c()-funksjonen lager vektorer
-v2 <- c(4, 5, 6)
-matrix(c(v1, v2), nrow = 3, ncol = 2)
+v1 <- c(3, 4) # c()-funksjonen lager vektorer
+matrix(c(v1, v1), nrow = 2, ncol = 2)
 ```
 
 ```
      [,1] [,2]
-[1,]    1    4
-[2,]    2    5
-[3,]    3    6
+[1,]    3    3
+[2,]    4    4
 ```
 
 `data.frame` er en slags `matrix` med kolonnenavn (men er egentlig basert på `list`)
@@ -142,7 +142,7 @@ mtcars[1:3, "cyl"]
 mtcars[1:3, 2] # Kan også bruke kolonnens plassing ("cyl" er kolonne nr. 2)
 ```
 
-Klamme-syntaksen kan også brukes til å lage "delmengder" av objektene:
+Klamme-syntaksen kan også brukes til å lage "delmengder":
 
 
 ```r
@@ -160,7 +160,7 @@ l1 <- list(3, 4) # `list` med ett nivå
 l2 <- list(list(3, 4), list(5, 6)) # `list` med to nivåer
 ```
 
-Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan `$` benyttes. Hvis ikke, brukes doble klammer, `[[]]`:
+Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan `$` benyttes. Hvis ikke, brukes doble klammer:
 
 
 ```r

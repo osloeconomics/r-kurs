@@ -889,7 +889,7 @@ hljs.initHighlightingOnLoad();
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>Objekter og operatorer</h3>
+<h3>Objekter</h3>
 <div class="slideContent" >
 <p>R er et <em>objektorientert</em> språk. De vanligste objekttypene er vector, matrix, data.frame og list. Vi lager objekter ved hjelp av en &ldquo;venstre-pil&rdquo;.</p>
 
@@ -898,6 +898,12 @@ hljs.initHighlightingOnLoad();
 
 <p>Objekter forblir lagret i minnet fram til R avsluttes, eller til man fjerner objektet manuelt ved hjelp av <code>rm()</code>. En av fordelene med R (sammnelignet med Stata) er at det er mulig å ha mange datasett i minnet samtidig.</p>
 
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Operatorer</h3>
+<div class="slideContent" >
 <p><code>=</code> brukes inni funksjoner, ikke til å lage objekter:</p>
 
 <pre><code class="r">n2 &lt;- paste(&quot;4&quot;, &quot;2&quot;, &quot;0&quot;, sep = &quot;&quot;) # &quot;limer&quot; sammen 4, 2 og 0
@@ -927,15 +933,13 @@ hljs.initHighlightingOnLoad();
 <div class="slideContent" >
 <p>Vi har altså <code>vector</code>, <code>matrix</code>, <code>data.frame</code> og <code>list</code>. <code>matrix</code> består av én eller flere <code>vector</code>. </p>
 
-<pre><code class="r">v1 &lt;- c(1, 2, 3) # c()-funksjonen lager vektorer
-v2 &lt;- c(4, 5, 6)
-matrix(c(v1, v2), nrow = 3, ncol = 2)
+<pre><code class="r">v1 &lt;- c(3, 4) # c()-funksjonen lager vektorer
+matrix(c(v1, v1), nrow = 2, ncol = 2)
 </code></pre>
 
 <pre><code>     [,1] [,2]
-[1,]    1    4
-[2,]    2    5
-[3,]    3    6
+[1,]    3    3
+[2,]    4    4
 </code></pre>
 
 <p><code>data.frame</code> er en slags <code>matrix</code> med kolonnenavn (men er egentlig basert på <code>list</code>)</p>
@@ -969,7 +973,7 @@ mtcars[1:3, &quot;cyl&quot;]
 mtcars[1:3, 2] # Kan også bruke kolonnens plassing (&quot;cyl&quot; er kolonne nr. 2)
 </code></pre>
 
-<p>Klamme-syntaksen kan også brukes til å lage &ldquo;delmengder&rdquo; av objektene:</p>
+<p>Klamme-syntaksen kan også brukes til å lage &ldquo;delmengder&rdquo;:</p>
 
 <pre><code class="r">mtcars[mtcars$cyl &gt; 4, ] # henter ut alle rader hvor &quot;cyl&quot; er større enn 4
 mtcars[mtcars$cyl &gt; 4, &quot;cyl&quot;] # henter ut alle verdier av &quot;cyl&quot; som er større enn 4
@@ -987,7 +991,7 @@ mtcars[mtcars$cyl &gt; 4, &quot;cyl&quot;] # henter ut alle verdier av &quot;cyl
 l2 &lt;- list(list(3, 4), list(5, 6)) # `list` med to nivåer
 </code></pre>
 
-<p>Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan <code>$</code> benyttes. Hvis ikke, brukes doble klammer, <code>[[]]</code>:</p>
+<p>Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan <code>$</code> benyttes. Hvis ikke, brukes doble klammer:</p>
 
 <pre><code class="r">testlist &lt;- list(&quot;element1&quot; = 3, &quot;element2&quot; = 4) # navngitt liste 
 testlist[[1]]
