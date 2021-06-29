@@ -1,0 +1,251 @@
+---
+title: "R: Databehandling, analyse og visualisering"
+author: "Eivind Moe Hammersmark"
+date: "`r Sys.Date()`"
+output: 
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      ratio: '16:10'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_accent(
+  base_color = "#1c5253",
+  header_font_google = google_font("Open Sans"),
+  text_font_google   = google_font("Open Sans"),
+  code_font_google   = google_font("Fira Mono")
+)
+```
+
+## Hvorfor R?
+.pull-left[
+Sentrale arbeidsoppgaver i OE: 
+
+  - Databehandling
+  - Analyse
+  - Visualisering
+
+Alle tre bør dokumenteres. Det gjør det mulig å replikere analysen (av deg selv eller andre), og gir transparens.
+ 
+]
+
+.pull-right[
+Det er her R/Python/Stata kommer inn ==> dokumentasjonen ligger i koden!
+
+Både R, Python og Stata er gode til databehandling og analyse.
+
+R er allsidig, open source, har stor brukermasse innenfor samfunns-vitenskap og svært bra GIS-funksjonalitet. 
+
+<!-- Velg Excel for å lage diagrammer, og dersom du trenger kjappe og enkle analyser. Velg QGIS for å lage pene kart, men vær oppmerksom på at det kan være tidkrevende dersom du trenger å gjøre det på nytt (f.eks. på andre data). -->
+]
+
+| Verktøy | Databehandling | Analyse        | Diagrammer    | Kart      |
+|---------|----------------|----------------|---------------|-----------|
+| Excel   | omg just don't | omg just don't | Ja            | Begrenset |
+| Stata   | Ja             | Ja             | Ja            | Begrenset |
+| Python  | Ja             | Ja             | Ja            | Ja        |
+| R       | Ja             | Ja             | Ja            | Ja        |
+| QGIS    | Begrenset      | Nei            | Nei           | Ja        |  
+
+---
+
+## Hva vil du lære på dette kurset?
+
+- **R basics**: Kodeprinsipper og vanligste funksjoner
+- **Arbeidsflyt**: Veien fra rådata til analyseresultater
+- Databehandling og -manipulering
+- Enkle regresjonsanalyser m/eksport av resulater til en tabell
+- Hvordan skrive pene og forståelige R-script
+- Scriptet nedlasting av data vha. API
+- Lage kart og diagrammer
+
+Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet
+
+---
+class: center, middle
+
+# R basics
+
+---
+## Objekter
+R er et *objektorientert* språk. De vanligste objekttypene er `vector`, `matrix`, `data.frame` og `list`. Vi lager objekter (og fyller dem med informasjon) ved hjelp av en "venstre-pil".
+
+
+```{r eval=TRUE}
+n1 <- 420
+```
+
+Objekter forblir lagret i minnet fram til R avsluttes, eller til man fjerner objektet manuelt ved hjelp av `rm()`. 
+
+Datasett lagres som `data.frame`-objekter. R tillater mange datasett i minnet samtidig, til forskjell fra f.eks. Stata.
+
+---
+
+## Operatorer
+
+`=` brukes inni funksjoner, ikke til å lage objekter:
+  
+  
+```{r eval=TRUE}
+n2 <- paste("4", "2", "0", sep = "") # "limer" sammen 4, 2 og 0
+```
+
+Dobbelt likhetstegn brukes for å sammenligne noe (som i Stata)
+
+
+```{r eval=TRUE}
+n1 == as.integer(n2) 
+```
+
+Ellers fungerer de vanlige matematiske operatorene som forventet
+
+```{r eval=TRUE}
+(200 + 15 - 5) * 2
+```
+
+---
+
+## Objekttyper
+
+Vi har altså `vector`, `matrix`, `data.frame` og `list`. `matrix` består av én eller flere `vector`. 
+
+
+```{r eval=TRUE}
+v1 <- c(3, 4) # c()-funksjonen lager vektorer
+matrix(c(v1, v1), nrow = 2, ncol = 2)
+```
+
+Datasett som leses inn i R lagres vanligvis som `data.frame`, som er en variant av `list`.
+
+```{r eval=TRUE}
+class(mtcars) 
+```
+
+```{r eval=TRUE}
+typeof(mtcars) # typeof gir den underliggende datastrukturen
+```
+
+---
+
+## Hente ut elementer fra objekter
+
+  Det finnes hovedsakelig to funksjoner for å hente ut elementer av objekter, `$` og `[]`. Førstnevnte fungerer bare på `data.frame` og `named list`. Syntaksen er `mtcars$kolonnenavn` og `mtcars[, kolonne]`. I sistnevnte kan også rader spesifiseres.
+
+
+```{r eval=FALSE}
+# Alle rader, kolonnen "cyl"
+mtcars$cyl 
+mtcars[, "cyl"] # merk anførselstegn her
+```
+
+```{r eval=FALSE}
+# Rad 1 til 3, kolonne "cyl"
+mtcars$cyl[1:3]
+mtcars[1:3, "cyl"]
+mtcars[1:3, 2] # Kan også bruke kolonnens plassering.
+```
+
+Klamme-syntaksen kan også brukes til å lage "delmengder":
+  
+```{r eval=FALSE}
+mtcars[mtcars$cyl > 4, ] # Alle rader der "cyl" er større enn 4
+mtcars[mtcars$cyl > 4, "cyl"] # Alle verdier av "cyl" større enn 4
+```
+
+---
+
+## list-objekter
+
+Et `list`-objekt er en liste med objekter, for eksempel en liste med `data.frame`. `list`-objekter er hierarkiske og kan ha mange nivåer.
+
+
+```{r eval=FALSE}
+l1 <- list(3, 4) # `list` med ett nivå
+l2 <- list(list(3, 4), list(5, 6)) # `list` med to nivåer
+```
+
+Syntaksen for å hente ut elementer fra en liste er litt spesiell. Dersom listen er navngitt, kan `$` benyttes. Hvis ikke, brukes doble klammer:
+  
+  
+```{r eval=TRUE}
+testlist <- list("element1" = 3, "element2" = 4) # navngitt liste 
+testlist[[1]]
+```
+
+```{r eval=TRUE}
+testlist$element1
+```
+
+---
+
+## list-objekter: Eksempel
+Lister er nyttige dersom du trenger å utføre samme operasjon på flere objekter. For eksempel samme regresjon på flere datasett:
+  
+  
+```{r eval = TRUE}
+mtl <- list("Original" = mtcars, "Modified" = mtcars[mtcars$cyl > 4, ])
+lapply(mtl, function(x) {
+  reg <- lm(mpg ~ hp + wt, data = x)
+  summary(reg)$coefficients
+})
+```
+
+---
+
+## Pakker
+
+De viktigste funksjonene er integrert i R. Øvrige funksjoner finnes i *pakker* som hentes inn med  `library`-funksjonen (tilsvarer `include` i Python).
+
+```{r, eval = FALSE}
+install.packages("dplyr") # Må installeres først.
+library(dplyr)            
+filter(mtcars, cyl >= 8)  # Kun biler med svær motor
+```
+
+- **NB:** Ulike pakker kan inneholde funksjoner som deler navn med hverandre. Feks. `filter`-funksjonen i `dplyr` deler navn med en pakke i den innebygde `stats`-pakken.
+- Den siste pakken som lastes inn får prioritet ved navnekonflikt.
+ 
+---
+## Direkte henvisning til funksjoner
+
+Det er mulig å benytte spesifikke funksjoner uten å hente den inn vha. `library` først. Nyttig dersom flere pakker benytter samme funksjonsnavn:
+
+```{r, eval = TRUE}
+filtered <- dplyr::filter(mtcars, cyl >= 8)
+head(filtered, 2) # Kun de to første radene
+```
+
+```{r, eval = FALSE}
+stats::filter(mtcars, cyl >= 8) # Funker ikke på samme måte
+```
+
+```{r, eval = TRUE, echo=FALSE, message = TRUE, error = TRUE}
+tryCatch(stats::filter(mtcars, cyl >= 8), error = function(cond) message(cond))
+```
+
+---
+
+## Tidyverse
+`dplyr`-pakken vi nettopp har brukt er en del av `tidyverse`, en samling med pakker som er skapt for databehandling, og deler samme grammatikk, datastruktur og underliggende filosofi. 
+
+Syntaksen i dette "universet" skiller seg fra standard R-syntaks, men er bygget på en mer intuitiv tilnærming til databearbeiding.
+
+`dplyr`-syntaksen er basert på **verb**, og beskriver nærmest med ord hva som skjer med dataene (på ængelsk da): 
+
+```{r eval = FALSE} 
+filter(mtcars, cyl >= 8)
+```
+kan oversettes til "filter `mtcars`, keeping only cars with at least 8 cylinders".
+
+Vi kommer stort sett til å forbli innenfor `tidyverse` i resten av dette kurset. 
+
