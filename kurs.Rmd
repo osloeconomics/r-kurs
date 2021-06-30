@@ -5,12 +5,16 @@ date: "`r Sys.Date()`"
 output: 
   xaringan::moon_reader:
     lib_dir: libs
-    css: xaringan-themer.css
+    css: [default, ninjutsu, xaringan-themer.css, footer-header.css]
     nature:
       ratio: '16:10'
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+---
+
+layout:true
+<div class="my-footer"><span>Introduksjon</span></div>
 ---
 
 ```{r setup, include=FALSE}
@@ -62,8 +66,8 @@ R er allsidig, open source, har stor brukermasse innenfor samfunns-vitenskap og 
 ## Hva vil du lære på dette kurset?
 
 - **R basics**: Kodeprinsipper og vanligste funksjoner
+- **Tidyverse**: Behandling og sjonglering av data
 - **Arbeidsflyt**: Veien fra rådata til analyseresultater
-- Databehandling og -manipulering
 - Enkle regresjonsanalyser m/eksport av resulater til en tabell
 - Hvordan skrive pene og forståelige R-script
 - Scriptet nedlasting av data vha. API
@@ -71,12 +75,21 @@ R er allsidig, open source, har stor brukermasse innenfor samfunns-vitenskap og 
 
 Vi bruker det innebygde datasettet `mtcars` for å illustrere funksjonalitet
 
+
 ---
+layout:true
+<div class="my-footer"><span></span></div>
+---
+
 class: center, middle
 
 # R basics
 
 ---
+layout:true
+<div class="my-footer"><span>R basics</span></div>
+---
+
 ## Objekter
 R er et *objektorientert* språk. De vanligste objekttypene er `vector`, `matrix`, `data.frame` og `list`. Vi lager objekter (og fyller dem med informasjon) ved hjelp av en "venstre-pil".
 
@@ -216,6 +229,7 @@ filter(mtcars, cyl >= 8)  # Kun biler med svær motor
 - Den siste pakken som lastes inn får prioritet ved navnekonflikt.
  
 ---
+
 ## Direkte henvisning til funksjoner
 
 Det er mulig å benytte spesifikke funksjoner uten å hente den inn vha. `library` først. Nyttig dersom flere pakker benytter samme funksjonsnavn:
@@ -234,6 +248,19 @@ tryCatch(stats::filter(mtcars, cyl >= 8), error = function(cond) message(cond))
 ```
 
 ---
+layout:true
+<div class="my-footer"><span></span></div>
+---
+
+class: center, middle
+
+# Tidyverse
+
+
+---
+layout:true
+<div class="my-footer"><span>Tidyverse</span></div>
+---
 
 ## Tidyverse
 `dplyr`-pakken vi nettopp har brukt er en del av `tidyverse`, en samling med pakker som er skapt for databehandling, og deler samme grammatikk, datastruktur og underliggende filosofi. 
@@ -248,4 +275,133 @@ filter(mtcars, cyl >= 8)
 kan oversettes til "filter `mtcars`, keeping only cars with at least 8 cylinders".
 
 Vi kommer stort sett til å forbli innenfor `tidyverse` i resten av dette kurset. 
+
+---
+
+## Pipe-operatoren
+
+Pipe-operatoren står sentralt i `tidyverse` (og særlig `dplyr`). I base-R gjør man flere operasjoner ved å mellomlagre resultater i objekter underveis, eller putte funksjoner inni funksjoner:
+
+```{r eval = FALSE}
+# Enten
+large <- mtcars[mtcars$cyl >= 8, ]  # Lagre nytt datasett med biler med store motorer
+mean(large$wt)                      # Ta gjennomsnitt av vekten av bilene
+# Eller
+mean(mtcars[mtcars$cyl >= 8, "wt"]) # Begge operasjoner i én linje
+```
+
+I `tidyverse` bruker man piping for å gjøre flere ting samtidig:
+
+```{r eval = FALSE, messages = FALSE}
+library(dplyr)
+mtcars %>%             # Deklarer objektet som operasjoner skal utføres på
+  filter(cyl >= 8) %>% # Filtrer ut biler med store motorer
+  pull(wt) %>%         # Trekk ut variabelen `wt` som en vektor
+  mean()               # Ta gjennomsnittet av vektoren `wt`
+```
+
+Syntaksen i base-R er ofte mer kompakt, men `tidy`-syntaksen er lettere å lese, og er mer i tråd med den faktiske rekkefølgen i operasjonene.
+
+???
+
+I siste versjon av R er det en innebygget pipe-operator.
+
+---
+
+## String-matching
+
+Vi er ofte nødt til å gjøre tekstsøk for å kategorisere eller filtrere data. Dette er lettvint i `tidy`-syntaks, vha. `stringr`-pakken:
+
+```{r eval = TRUE, message=FALSE}
+library(tidyverse)
+tysk <- c("Merc|Porsche")            # Merc(edes) eller Porsche
+
+mtcars %>%
+  mutate(name = rownames(.)) %>%     # Lag variabel for bilmodell basert på radnavn
+  filter(str_detect(name, tysk)) # Hent ut alle rader med tyske bilmerker
+```
+
+---
+
+## Merging/joining av data
+
+```{r eval = TRUE, message = FALSE}
+library(tidyverse)
+motor <- data.frame(cyl = c(4, 6, 8), størrelse = c("liten", "medium", "stor"))
+mtcars %>%
+  left_join(motor, by = "cyl") %>% # "merge" med datasettet med motorstørrelse
+  summarytools::freq(størrelse)
+```
+
+---
+
+layout: true
+
+---
+
+## Ulike typer joins
+
+.pull-left[
+  ![](joins.png)
+]
+
+.pull-right[
+- `by = "x1"` betyr matching på `x1`-variabelen. Kan matche på flere variabler, og de trenger ikke ha samme navn i `a` og `b`
+  - `by = c("x1", "id_a" = "id_b"))`
+- `left_join()` og beholder alle rader i `a`
+  - Jeg bruker denne i 80 % av tilfellene
+  - tilsvarer `merge` i Stata
+  - `m:1` er implisitt dersom samme rad i `a` matcher flere rader i `b`
+- `right_join()` beholder alle rader i `b`
+- `inner_join()` beholder kun rader i `a` som matcher rader i `b`
+- `full_join()` beholder alle rader i både `a` og `b`
+
+]
+
+---
+
+## Reshaping: "long" til "wide"
+
+Reshaping i `tidyverse` kalles "pivotering".
+`pivot_wider` tilsvarer `reshape wide` i Stata:
+
+```{r eval = TRUE}
+library(tidyverse)
+data("Fatalities", package = "AER") # Last inn datasettet.
+fatal_compact <- Fatalities %>%
+  select(state, year, fatal) 
+head(fatal_compact, 3)
+fatal_wide <- fatal_compact %>% # I Stata: reshape wide fatal, i(state) j(year)
+  pivot_wider(names_from = year, values_from = fatal, names_prefix = "fatal")
+head(fatal_wide, 1)
+```
+
+???
+
+Merk: Variabler som ikke spesifiseres som "navnevariabel" eller "verdivariabel" tolkes automatisk som "id-variabel"
+
+---
+
+layout: true
+<div class="my-footer"><span>Tidyverse</span></div>
+
+---
+## Reshaping: "wide" til "long"
+
+`pivot_longer` tilsvarer `reshape long` i Stata:
+
+```{r eval = FALSE}
+fatal_long <- fatal_wide %>% # I Stata: reshape long fatal, i(state) j(year)
+  pivot_longer(cols = starts_with("fatal"),
+               names_to = c("year"), names_prefix = "fatal", values_to = "fatal")
+
+head(fatal_long, 5)
+```
+
+???
+
+Akkurat reshaping av data er nok lettere i Stata. Jeg ender ofte opp med å google `pivot`-funksjonene...
+
+---
+
 
